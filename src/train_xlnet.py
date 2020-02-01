@@ -5,14 +5,14 @@ import tensorflow.keras.backend as K
 from sklearn.model_selection import GroupKFold
 from transformers import XLNetTokenizer
 from preprocessings.preprocessing import preprocessing
-from featurizers.featurizer import compute_input_arrays, compute_label_arrays
+from featurizers.featurizer import compute_xlnet_input_arrays, compute_label_arrays
 from models.xlnet_model import create_xlnet_model
 from utils.set_gpus import set_gpu
 from utils.custom_callbacks import CustomCallback
 
 data_path = '../data/input/google-quest-challenge/'
 xlnet_path = '../data/pretraining_models/xlnet/'
-save_xlnet_path = '../../outputs/models/xlnet/'
+save_xlnet_path = '../outputs/models/xlnet/'
 max_sequence_length = 512
 tokenizer = XLNetTokenizer.from_pretrained(xlnet_path + 'xlnet_base_cased_tokenizer/')
 
@@ -32,8 +32,8 @@ def train():
 
     # df_train, df_test, df = preprocessing(df_train, df_test, df, input_categories)
 
-    inputs = compute_input_arrays(df_train, input_categories, tokenizer, max_sequence_length)
-    test_inputs = compute_input_arrays(df_test, input_categories, tokenizer, max_sequence_length)
+    inputs = compute_xlnet_input_arrays(df_train, input_categories, tokenizer, max_sequence_length)
+    test_inputs = compute_xlnet_input_arrays(df_test, input_categories, tokenizer, max_sequence_length)
     labels = compute_label_arrays(df_train, label_categories)
 
     cols_name_1 = [i for i in df.columns if i.startswith('host_') or i.startswith('cat_')]

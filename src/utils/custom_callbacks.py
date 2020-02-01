@@ -26,7 +26,7 @@ class CustomCallback(tf.keras.callbacks.Callback):
 
         if self.fold is not None:
             model_name = self.save_model_path.split('/')[-2]
-            self.model.save_weights(self.save_model_path + f'{model_name}-base-{self.fold}-{epoch}-{rho_val}.h5')
+            self.model.save_weights(f'{self.save_model_path}{model_name}-base-{self.fold}-{epoch}-{rho_val}.h5')
 
         self.test_predictions.append(self.model.predict(x=self.test_inputs, batch_size=self.batch_size))
 

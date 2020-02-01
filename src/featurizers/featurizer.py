@@ -55,5 +55,33 @@ def compute_input_arrays(df, columns, tokenizer, max_sequence_length):
             np.asarray(input_answer_segments, dtype=np.int32)]
 
 
+def compute_xlnet_input_arrays(df, columns, tokenizer, max_sequence_length):
+    input_question_ids, input_question_masks, input_question_segments = [], [], []
+    input_answer_ids, input_answer_masks, input_answer_segments = [], [], []
+    for _, instance in tqdm(df[columns].iterrows()):
+        title, question, answer = instance.question_title, instance.question_body, instance.answer
+
+        q_ids, q_masks, q_segments, a_ids, a_masks, a_segments = convert_to_transformer_inputs(title,
+                                                                                               question,
+                                                                                               answer,
+                                                                                               tokenizer,
+                                                                                               max_sequence_length)
+
+        input_question_ids.append(q_ids)
+        input_question_masks.append(q_masks)
+        input_question_segments.append(q_segments)
+
+        input_answer_ids.append(a_ids)
+        input_answer_masks.append(a_masks)
+        input_answer_segments.append(a_segments)
+
+    return [np.asarray(input_question_ids, dtype=np.int32),
+            np.asarray(input_question_masks, dtype=np.float32),
+            np.asarray(input_question_segments, dtype=np.int32),
+            np.asarray(input_answer_ids, dtype=np.int32),
+            np.asarray(input_answer_masks, dtype=np.float32),
+            np.asarray(input_answer_segments, dtype=np.int32)]
+
+
 def compute_label_arrays(df, columns):
     return np.asarray(df[columns])

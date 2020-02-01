@@ -12,7 +12,7 @@ from utils.custom_callbacks import CustomCallback
 
 data_path = '../data/input/google-quest-challenge/'
 bert_path = '../data/pretraining_models/bert/'
-save_bert_path = '../../outputs/models/bert/'
+save_bert_path = '../outputs/models/bert/'
 max_sequence_length = 512
 tokenizer = BertTokenizer.from_pretrained(bert_path + 'bert-base-uncased-tokenizer/vocab.txt')
 
