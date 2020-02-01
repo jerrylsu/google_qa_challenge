@@ -1,0 +1,41 @@
+1. baseline
+
+    input_word_ids = tf.keras.layers.Input((max_sequence_length,), dtype=tf.int32, name='input_word_ids')
+    input_masks = tf.keras.layers.Input((max_sequence_length,), dtype=tf.int32, name='input_masks')
+    input_segments = tf.keras.layers.Input((max_sequence_length,), dtype=tf.int32, name='input_segments')
+    bert_layer = hub.KerasLayer(bert_path, trainable=True)
+    _, sequence_output = bert_layer([input_word_ids, input_masks, input_segments])
+    x = tf.keras.layers.Bidirectional(tf.keras.layers.LSTM(max_sequence_length))(sequence_output)
+    x = tf.keras.layers.Dropout(0.2)(x)
+    out = tf.keras.layers.Dense(30, activation='sigmoid', name='dense_output')(x)
+
+10GroupKFold + baseBert + BiLSTM + DropOut + Dense
+learning_rate=3e-5, epochs=7, batch_size=8
+
+2. gkf = GroupKFold(nsplits=5).split(X=dftrain.questionbody, groups=dftrain.question_body)
+
+Because there are instances with the same question (but with different answers), this causes a leak if not handled properly.
+In this case solved using Group K-folds, where these 'same questions' will be contained within the same fold.
+
+3. This might be a dumb question as I am new to Keras and NLP. What's the advantage to make predictions at the end of each
+epoch like you did versus at the end of each fold?
+
+Reply
+@raphael1123 I'm happy you learned a lot! The advantage is that you can average all epochs prediction to obtain a slightly
+ better fold-prediction than if you weren't doing it. This does not always work, but it does in this case. :-)
+
+Reply
+@akensert Thank you for your kind reply!
+
+Could you explain a bit more how this works? I am a little confused because theoretically the last epoch does better than
+ the first epoch. Why would we be interested in even the first epoch?
+
+Reply
+@raphael1123 Yes you are right, but averaging is powerful! And BERT starts to perform great already after 1-2 epochs.
+What you could do is to do a weighted average: if you assume that epoch 2 is significantly better than epoch 1, you
+could do np.average([epoch1, epoch2], axis=0, weights=[1, 4]).
+
+To answer your question more directly about the first epoch: Even though the first epoch is performing worse than
+the last epoch, the first epoch could capture patterns that the last epoch isn't. However, in practice, you would
+just use the best performing epoch (let's say the last epoch), because saving BERT weights for each epoch to do
+predictions with would take up way too much space, and inference time would also increase significantly :-)
